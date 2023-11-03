@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Hand Strength Calculator</title>
+    <!-- TO DO: Add CSS for styling -->
+</head>
+<body>
+    <form action="/" method="POST">
+        <div>
+            <label>Your Hand:</label>
+            <input type="text" name="hand1" readonly onclick="selectCard(this)">
+            <input type="text" name="hand2" readonly onclick="selectCard(this)">
+        </div>
+
+        <div>
+            <label>Evaluation Method:</label>
+            <select name="evaluation">
+                <option value="algorithm1">algorithm1</option>
+                <option value="algorithm2">algorithm2</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Table Cards (Optional):</label>
+            <input type="text" name="table1" readonly onclick="selectCard(this)">
+            <input type="text" name="table2" readonly onclick="selectCard(this)">
+            <input type="text" name="table3" readonly onclick="selectCard(this)">
+            <input type="text" name="table4" readonly onclick="selectCard(this)">
+            <input type="text" name="table5" readonly onclick="selectCard(this)">
+        </div>
+
+        <div>
+            <label>Number of Opponents (Optional):</label>
+            <select name="opponents">
+                <option value=""></option>
+                {% for i in range(1, 8) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <button type="submit">CALCULATE!</button>
+        </div>
+    </form>
+
+    <div>
+        <!-- TO DO: Convert Clickable Card Selection GUI into card images -->
+        <ul>
+            {% for rank in ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2"] %}
+                {% for suit in ["H", "D", "S", "C"] %}
+                    <li onclick="setCardValue('{{ rank + suit }}')">{{ rank + suit }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        let selectedInput = null;
+
+        function selectCard(inputElement) {
+            selectedInput = inputElement;
+        }
+
+        function setCardValue(card) {
+            if (selectedInput) {
+                selectedInput.value = card;
+                selectedInput = null;
+            }
+        }
+    </script>
+</body>
+</html>
