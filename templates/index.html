@@ -4,14 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poker Hand Strength Calculator</title>
-    <!-- TO DO: Add CSS for styling -->
+    <!-- Added some basic embedded CSS for now. Need to organize card images into columns x rows = 4x13 -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        input[type="text"] {
+            width: 50px;
+            margin-right: 10px;
+        }
+
+        span {
+            cursor: pointer;
+            background-color: #ccc;
+            padding: 2px 6px;
+            border-radius: 5px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: inline-block;
+            margin: 5px;
+        }
+
+        li img {
+            width: 50px;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
+<!-- TO DO: Make card image populate into "Your Hand" and "Table Card" boxes -->
+<!-- TO DO: Make deselect/clear card button not an X beside entry, but the card itself-->
+<!-- TO DO: Gray out any cards that have been input. -->
+<!-- DEBUG: AD.png not displayed in selection menu -->
 <body>
     <form action="/" method="POST">
         <div>
             <label>Your Hand:</label>
             <input type="text" name="hand1" readonly onclick="selectCard(this)">
+            <span onclick="clearCard(this.previousElementSibling)">X</span>
             <input type="text" name="hand2" readonly onclick="selectCard(this)">
+            <span onclick="clearCard(this.previousElementSibling)">X</span>
         </div>
 
         <div>
@@ -25,10 +64,15 @@
         <div>
             <label>Table Cards (Optional):</label>
             <input type="text" name="table1" readonly onclick="selectCard(this)">
+            <span onclick="clearCard(this.previousElementSibling)">X</span>
             <input type="text" name="table2" readonly onclick="selectCard(this)">
+            <span onclick="clearCard(this.previousElementSibling)">X</span>
             <input type="text" name="table3" readonly onclick="selectCard(this)">
+            <span onclick="clearCard(this.previousElementSibling)">X</span>
             <input type="text" name="table4" readonly onclick="selectCard(this)">
+            <span onclick="clearCard(this.previousElementSibling)">X</span>
             <input type="text" name="table5" readonly onclick="selectCard(this)">
+            <span onclick="clearCard(this.previousElementSibling)">X</span>
         </div>
 
         <div>
@@ -51,7 +95,9 @@
         <ul>
             {% for rank in ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2"] %}
                 {% for suit in ["H", "D", "S", "C"] %}
-                    <li onclick="setCardValue('{{ rank + suit }}')">{{ rank + suit }}</li>
+                    <li onclick="setCardValue('{{ rank + suit }}')">
+                        <img src="{{ url_for('static', filename='card_images/' + rank + suit + '.png') }}" alt="{{ rank + suit }}">
+                    </li>
                 {% endfor %}
             {% endfor %}
         </ul>
@@ -69,6 +115,10 @@
                 selectedInput.value = card;
                 selectedInput = null;
             }
+        }
+
+        function clearCard(inputElement) {
+            inputElement.value = '';
         }
     </script>
 </body>
