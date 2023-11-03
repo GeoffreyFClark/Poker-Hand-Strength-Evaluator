@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poker Hand Strength Calculator</title>
-    <!-- Added some basic embedded CSS for now. Need to organize card images into columns x rows = 4x13 -->
+    <!-- Added some basic embedded CSS for the initial design. 
+        Need to organize card images into columns x rows = 4x13 -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -41,10 +42,11 @@
 
 <!-- TO DO: Make card image populate into "Your Hand" and "Table Card" boxes -->
 <!-- TO DO: Make deselect/clear card button not an X beside entry, but the card itself-->
-<!-- TO DO: Gray out any cards that have been input. -->
-<!-- DEBUG: AD.png not displayed in selection menu -->
 <body>
+    <!-- Main form sends a POST request w user inputs -->
     <form action="/" method="POST">
+
+        <!-- Section to select hand cards -->
         <div>
             <label>Your Hand:</label>
             <input type="text" name="hand1" readonly onclick="selectCard(this)">
@@ -53,6 +55,7 @@
             <span onclick="clearCard(this.previousElementSibling)">X</span>
         </div>
 
+        <!-- Dropdown to select evaluation algorithm -->
         <div>
             <label>Evaluation Method:</label>
             <select name="evaluation">
@@ -61,6 +64,7 @@
             </select>
         </div>
 
+        <!-- Section to select table cards (if any) -->
         <div>
             <label>Table Cards (Optional):</label>
             <input type="text" name="table1" readonly onclick="selectCard(this)">
@@ -75,11 +79,12 @@
             <span onclick="clearCard(this.previousElementSibling)">X</span>
         </div>
 
+        <!-- Dropdown to select number of opponents (This can affect probability win%) -->
         <div>
             <label>Number of Opponents (Optional):</label>
             <select name="opponents">
                 <option value=""></option>
-                {% for i in range(1, 8) %}
+                {% for i in range(1, 7) %}
                     <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
             </select>
@@ -90,8 +95,10 @@
         </div>
     </form>
 
+    <!-- Section for the card image selection UI -->
+    <!-- TO DO: Gray out any cards that have been input. -->
+    <!-- DEBUG: AD.png not displayed in selection menu -->
     <div>
-        <!-- TO DO: Convert Clickable Card Selection GUI into card images -->
         <ul>
             {% for rank in ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2"] %}
                 {% for suit in ["H", "D", "S", "C"] %}
@@ -103,6 +110,7 @@
         </ul>
     </div>
 
+    <!-- Functions for UI interactions. -->
     <script>
         let selectedInput = null;
 
