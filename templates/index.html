@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poker Hand Strength Calculator</title>
-    <!-- Added some basic embedded CSS for the initial design. 
-        Need to organize card images into columns x rows = 4x13 -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,12 +11,11 @@
             color: white;
             display: flex;
             justify-content: space-between; /* Space between main content and card container */
-            padding: 20px; /* Adds some padding around the content */
+            padding: 20px; 
         }
 
-        /* Styling for the form or main content section */
         .main-content {
-            flex-grow: 1; /* Takes up the remaining space */
+            flex-grow: 1; 
         }
 
         input[type="text"] {
@@ -26,12 +23,7 @@
             height: 70px; 
             background-size: contain;
             background-repeat: no-repeat;
-            border: 1px solid #ccc; /* TEST */
-        }
-
-        .selected {
-            filter: brightness(0) invert(1);
-            -webkit-filter: brightness(0) invert(1);
+            border: 1px solid #ccc; 
         }
 
         /* Style for the input boxes to display the card image */
@@ -39,7 +31,7 @@
             display: inline-block;
             width: 35px;
             height: 50px;
-            background-size: cover; /* Ensures the background image covers the whole area */
+            background-size: cover; 
             border: 1px solid #ccc;
             margin-right: 10px;
             cursor: pointer;
@@ -73,16 +65,20 @@
             border: 1px solid #ccc;
         }
 
+        /* Card in Selection Grid once selected */
+        .selected {
+            filter: brightness(0) invert(1);
+            -webkit-filter: brightness(0) invert(1);
+        }
+
         .selected-card {
-            filter: grayscale(1); /* Grays out the selected card */
-            pointer-events: none;  /* Prevents clicking the card again */
+            filter: grayscale(1); 
+            pointer-events: none;  
         }
         
     </style>
 </head>
 
-<!-- TO DO: Make card image populate into "Your Hand" and "Table Card" boxes -->
-<!-- TO DO: Make deselect/clear card button not an X beside entry, but the card itself-->
 <body>
     <div class="main-content">
         <!-- Main form sends a POST request w user inputs -->
@@ -92,27 +88,20 @@
             <div style="margin-bottom: 25px;">
                 <label style="display: block; margin-bottom: 5px;">Your Hand:</label>
                 <input type="text" name="hand1" class="card-input" readonly onclick="selectCard(this)">
-                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
                 <input type="text" name="hand2" class="card-input" readonly onclick="selectCard(this)">
-                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
             </div>
 
             <!-- Section to select table cards (if any) -->
             <div style="margin-bottom: 25px;">
                 <label style="display: block; margin-bottom: 5px;">(Optional) Table Cards:</label>
                 <input type="text" name="table1" class="card-input" readonly onclick="selectCard(this)">
-                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
                 <input type="text" name="table2" class="card-input" readonly onclick="selectCard(this)">
-                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
                 <input type="text" name="table3" class="card-input" readonly onclick="selectCard(this)">
-                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
                 <input type="text" name="table4" class="card-input" readonly onclick="selectCard(this)">
-                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
                 <input type="text" name="table5" class="card-input" readonly onclick="selectCard(this)">
-                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
             </div>
 
-            <!-- Dropdown to select number of opponents (This can affect probability win%) -->
+            <!-- Dropdown to select number of opponents -->
             <div style="margin-bottom: 10px;">
                 <label>(Optional) Number of Opponents:</label>
                 <select name="opponents">
@@ -138,12 +127,13 @@
 
             <div>
                 <label>Result:</label>
+                <div>{{ output }}</div>
             </div>
+
         </form>
     </div>
 
     <!-- Section for the card image selection UI -->
-    <!-- TO DO: Gray out any cards that have been input. -->
     <div class="cards-container">
         {% for suit in ["H", "C", "D", "S"] %}
             <ul>
@@ -162,23 +152,24 @@
         let selectedCards = {};
     
         function selectCard(inputElement) {
+            // Clear the card if the input already has a card selected
             if (inputElement.value !== '') {
                 clearCard(inputElement); 
                 return; 
             }
 
-            // Toggle the card selection if the same input is clicked again
+            // If the input is already selected, unselect it
             if (selectedInput === inputElement) {
                 clearCard(inputElement);
                 selectedInput = null;
             } else {
-                // If there's already a card selected, unselect it
+                // If another input is selected, unselect it
                 if (selectedInput && selectedCards[selectedInput.name]) {
                     const prevCard = selectedCards[selectedInput.name];
                     document.querySelector(`img[data-card="${prevCard}"]`).classList.remove('selected');
                 }
                 selectedInput = inputElement;
-                // If there's already a card in the input, select it in the UI
+                // If a card is already selected for this input, highlight it
                 if (selectedCards[selectedInput.name]) {
                     const currentCard = selectedCards[selectedInput.name];
                     document.querySelector(`img[data-card="${currentCard}"]`).classList.add('selected');
@@ -188,10 +179,10 @@
 
         function setCardValue(card) {
             if (selectedInput) {
+                // Prevent selection in selection grid if card is already in use
                 if (Object.values(selectedCards).includes(card)) {
-                    return; // Prevent selection if card is already in use
+                    return; 
                 }
-    
                 // If a card is already selected in this input, unselect it
                 if (selectedCards[selectedInput.name]) {
                     const prevCard = selectedCards[selectedInput.name];
