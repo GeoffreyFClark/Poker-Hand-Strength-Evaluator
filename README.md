@@ -4,7 +4,7 @@ QUICK UPDATE Oct 2, 2023 to get us started (Brief overview posted here for refer
 
 Added a main.py for the backend, index.html for the frontend (served via Flask), and images for each of the 52 cards.
 
-![image](https://github.com/GeoffreyFClark/Poker-Hand-Strength-Visualizer/assets/97141856/ab3d5112-f282-49c6-8851-a5a83d2b1386)
+![image](nov23frontend.png)
 
 ## TO DO:
 
