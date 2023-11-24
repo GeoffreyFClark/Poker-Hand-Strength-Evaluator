@@ -19,14 +19,37 @@
         /* Styling for the form or main content section */
         .main-content {
             flex-grow: 1; /* Takes up the remaining space */
-            /* Add any additional styling for the main content here */
+        }
+
+        input[type="text"] {
+            width: 49px; 
+            height: 70px; 
+            background-size: contain;
+            background-repeat: no-repeat;
+            border: 1px solid #ccc; /* TEST */
+        }
+
+        .selected {
+            filter: brightness(0) invert(1);
+            -webkit-filter: brightness(0) invert(1);
+        }
+
+        /* Style for the input boxes to display the card image */
+        .card-input {
+            display: inline-block;
+            width: 35px;
+            height: 50px;
+            background-size: cover; /* Ensures the background image covers the whole area */
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            cursor: pointer;
+            font-size: 0;
         }
 
         .cards-container {
-            display: grid;
+            display: grid; 
             grid-template-columns: repeat(4, 1fr); /* 4 columns, one for each suit */
-            grid-gap: 10px; /* Space between columns */
-            max-width: 300px; /* Adjust as necessary */
+            max-width: 300px; 
         }
 
         .cards-container ul {
@@ -39,14 +62,22 @@
         }
 
         .cards-container li {
-            margin: 5px;
+            margin: 4px;
             text-align: center;
         }
 
         .cards-container li img {
-            width: 50px; /* Adjust size as needed */
+            width: 35px; 
             cursor: pointer;
+            transition: filter 0.3s;
+            border: 1px solid #ccc;
         }
+
+        .selected-card {
+            filter: grayscale(1); /* Grays out the selected card */
+            pointer-events: none;  /* Prevents clicking the card again */
+        }
+        
     </style>
 </head>
 
@@ -58,41 +89,32 @@
         <form action="/" method="POST">
 
             <!-- Section to select hand cards -->
-            <div>
-                <label>Your Hand:</label>
-                <input type="text" name="hand1" readonly onclick="selectCard(this)">
-                <span onclick="clearCard(this.previousElementSibling)">X</span>
-                <input type="text" name="hand2" readonly onclick="selectCard(this)">
-                <span onclick="clearCard(this.previousElementSibling)">X</span>
-            </div>
-
-            <!-- Dropdown to select evaluation algorithm -->
-            <div>
-                <label>Evaluation Method:</label>
-                <select name="evaluation">
-                    <option value="algorithm1">algorithm1</option>
-                    <option value="algorithm2">algorithm2</option>
-                </select>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 5px;">Your Hand:</label>
+                <input type="text" name="hand1" class="card-input" readonly onclick="selectCard(this)">
+                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
+                <input type="text" name="hand2" class="card-input" readonly onclick="selectCard(this)">
+                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
             </div>
 
             <!-- Section to select table cards (if any) -->
-            <div>
-                <label>Table Cards (Optional):</label>
-                <input type="text" name="table1" readonly onclick="selectCard(this)">
-                <span onclick="clearCard(this.previousElementSibling)">X</span>
-                <input type="text" name="table2" readonly onclick="selectCard(this)">
-                <span onclick="clearCard(this.previousElementSibling)">X</span>
-                <input type="text" name="table3" readonly onclick="selectCard(this)">
-                <span onclick="clearCard(this.previousElementSibling)">X</span>
-                <input type="text" name="table4" readonly onclick="selectCard(this)">
-                <span onclick="clearCard(this.previousElementSibling)">X</span>
-                <input type="text" name="table5" readonly onclick="selectCard(this)">
-                <span onclick="clearCard(this.previousElementSibling)">X</span>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 5px;">(Optional) Table Cards:</label>
+                <input type="text" name="table1" class="card-input" readonly onclick="selectCard(this)">
+                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
+                <input type="text" name="table2" class="card-input" readonly onclick="selectCard(this)">
+                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
+                <input type="text" name="table3" class="card-input" readonly onclick="selectCard(this)">
+                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
+                <input type="text" name="table4" class="card-input" readonly onclick="selectCard(this)">
+                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
+                <input type="text" name="table5" class="card-input" readonly onclick="selectCard(this)">
+                <!-- <span onclick="clearCard(this.previousElementSibling)">X</span> -->
             </div>
 
             <!-- Dropdown to select number of opponents (This can affect probability win%) -->
-            <div>
-                <label>Number of Opponents (Optional):</label>
+            <div style="margin-bottom: 10px;">
+                <label>(Optional) Number of Opponents:</label>
                 <select name="opponents">
                     <option value=""></option>
                     {% for i in range(1, 7) %}
@@ -101,8 +123,21 @@
                 </select>
             </div>
 
-            <div>
+            <!-- Dropdown to select evaluation algorithm -->
+            <div style="margin-bottom: 10px;">
+                <label>Evaluation Method:</label>
+                <select name="evaluation">
+                    <option value="algorithm1">algorithm1</option>
+                    <option value="algorithm2">algorithm2</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 80px;">
                 <button type="submit">CALCULATE!</button>
+            </div>
+
+            <div>
+                <label>Result:</label>
             </div>
         </form>
     </div>
@@ -114,7 +149,7 @@
             <ul>
                 {% for rank in ["A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3", "2"] %}
                     <li onclick="setCardValue('{{ rank + suit }}')">
-                        <img src="{{ url_for('static', filename='card_images/' + rank + suit + '.png') }}" alt="{{ rank + suit }}">
+                        <img src="{{ url_for('static', filename='card_images/' + rank + suit + '.png') }}" alt="{{ rank + suit }}" data-card="{{ rank + suit }}">
                     </li>
                 {% endfor %}
             </ul>
@@ -124,21 +159,63 @@
     <!-- Functions for UI interactions. -->
     <script>
         let selectedInput = null;
-
+        let selectedCards = {};
+    
         function selectCard(inputElement) {
-            selectedInput = inputElement;
+            if (inputElement.value !== '') {
+                clearCard(inputElement); 
+                return; 
+            }
+
+            // Toggle the card selection if the same input is clicked again
+            if (selectedInput === inputElement) {
+                clearCard(inputElement);
+                selectedInput = null;
+            } else {
+                // If there's already a card selected, unselect it
+                if (selectedInput && selectedCards[selectedInput.name]) {
+                    const prevCard = selectedCards[selectedInput.name];
+                    document.querySelector(`img[data-card="${prevCard}"]`).classList.remove('selected');
+                }
+                selectedInput = inputElement;
+                // If there's already a card in the input, select it in the UI
+                if (selectedCards[selectedInput.name]) {
+                    const currentCard = selectedCards[selectedInput.name];
+                    document.querySelector(`img[data-card="${currentCard}"]`).classList.add('selected');
+                }
+            }
         }
 
         function setCardValue(card) {
             if (selectedInput) {
+                if (Object.values(selectedCards).includes(card)) {
+                    return; // Prevent selection if card is already in use
+                }
+    
+                // If a card is already selected in this input, unselect it
+                if (selectedCards[selectedInput.name]) {
+                    const prevCard = selectedCards[selectedInput.name];
+                    document.querySelector(`img[data-card="${prevCard}"]`).classList.remove('selected');
+                }
+                // Set the new card value
                 selectedInput.value = card;
+                selectedInput.style.backgroundImage = `url('static/card_images/${card}.png')`;
+                selectedCards[selectedInput.name] = card;
+                // Add 'selected' class to the new card image to white it out
+                document.querySelector(`img[data-card="${card}"]`).classList.add('selected');
                 selectedInput = null;
             }
         }
 
         function clearCard(inputElement) {
+            const card = selectedCards[inputElement.name];
+            if (card) {
+                document.querySelector(`img[data-card="${card}"]`).classList.remove('selected');
+            }
             inputElement.value = '';
+            inputElement.style.backgroundImage = 'none';
+            delete selectedCards[inputElement.name];
         }
-    </script>
+    </script>    
 </body>
 </html>
