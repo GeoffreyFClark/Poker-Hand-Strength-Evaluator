@@ -1,6 +1,6 @@
 # Poker-Hand-Strength-Visualizer
 
-QUICK UPDATE Oct 2, 2023 to get us started (Brief overview posted here for easy reference; see Discord groupchat for further details):
+QUICK UPDATE Oct 2, 2023 to get us started (Brief overview posted here for reference):
 
 Added a main.py for the backend, index.html for the frontend (served via Flask), and images for each of the 52 cards.
 
