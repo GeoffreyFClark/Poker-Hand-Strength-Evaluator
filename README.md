@@ -2,19 +2,23 @@
 
 ![image](nov23frontend.png)
 
-## TO DO:
+## Key Assignment Requirements:
+REQUIREMENT 1:
+Implement 2 non-trivial, **comparable** algorithms or data structures. Data Structures and Algorithms that are **not** counted towards the requirement of two data structures and algorithms:
+- Any data structure from Module 2: Lists, Stacks, and Queues,
+- Binary Search Tree,
+- AVL Tree,
+- Binary and Linear Search,
+- Selection, Bubble, Heap, and Insertion Sort.
+REQUIREMENT 2:
+You must use a data set that has at least 100,000 tuples or rows or data points (e.g. 100,000 vertices in a Graph).
 
-Backend:
-- Implement algorithm1 and algorithm2. (Can rename for clarity once we've agreed upon algorithms to use based on assignment requirements)
- -- Two comparable combinatorial approaches? e.g. 1. Iterative Approach Using Hash Tables vs 2. Recursive Approach Using Graphs
+## UPDATE:
+Frontend essentially complete. Takes user input for hand_cards and optional table_cards. Algo1 or Algo2 is called using these parameters to generate output to be displayed.
 
-
-Frontend:
-- ~~Debug missing AD card in the selection GUI~~ Evidently, my Google Chrome adblock extension was somehow interfering with the AD card specifically haha
-- ~~Style the card selection GUI into a grid format (4 columns x 13 rows)~~
-- ~~Gray out selected cards (e.g., change to a white rectangle)~~
-- ~~Populate the selected card images into the "Your Hand" and "Table Cards" input boxes as opposed to 2 alphanumeric characters in boxes~~
-- ~~Allow removal of a card by clicking on populated card image instead of the current "X" system~~
-- ~~Ensure input from the frontend is properly processed as parameters for our algorithm functions~~
-- ~~Display the results once the "CALCULATE!" button is clicked~~
-- Add further CSS styling
+TO DO:
+To address REQUIREMENT 1, we need to implement Algo1 and Algo2 along w their data structures. 
+Plan is to implement Combinatorial Analysis algorithms to output a percentile for the user's hand among all possible poker hand combinations (taking into account 0 to 5 provided table cards).
+- 1. Iterative Approach Using Hash Tables
+- 2. Recursive Approach Using Graphs
+To address REQUIREMENT 2, if 3 table cards are input along w the user's hand (2 cards), we can output an additional percentile based on the user's input vs the poker dataset of 5 card combos.
