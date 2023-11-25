@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from itertools import combinations
 
 app = Flask(__name__)
 
@@ -13,7 +14,53 @@ class Card:
 
 # Iterative Approach Using Hash Tables
 def algorithm1(hand_cards, table_cards=[]):
-    return "Output from algorithm1"
+    card_values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13,
+                   'A': 14}
+
+    def calculate_hand_strength(hand):
+        sorted_hand = sorted(hand, key=lambda card: card_values[card.rank], reverse=True)
+        values = [card_values[card.rank] for card in sorted_hand]
+
+        is_straight = (values[0] - values[4] == 4) or (values == [14, 5, 4, 3, 2])
+
+        is_flush = len(set(card.suit for card in sorted_hand)) == 1
+
+        if is_straight and is_flush:
+            return 9  # straight flush
+        elif values.count(values[0]) == 4 or values.count(values[1]) == 4:
+            return 8  # four of a kind
+        elif values.count(values[0]) == 3 and values.count(values[3]) == 2:
+            return 7  # full house
+        elif is_flush:
+            return 6  # flush
+        elif is_straight:
+            return 5  # straight
+        elif values.count(values[0]) == 3:
+            return 4  # three of a kind
+        elif values.count(values[0]) == 2 and values.count(values[2]) == 2:
+            return 3  # two pair
+        elif values.count(values[0]) == 2:
+            return 2  # one pair
+        else:
+            return 1  # high card
+
+    all_cards = hand_cards + table_cards
+    combinations_count = {}
+
+    for card in all_cards:
+        if card.rank in combinations_count:
+            combinations_count[card.rank] += 1
+        else:
+            combinations_count[card.rank] = 1
+
+    total_combinations = 1
+    for count in combinations_count.values():
+        total_combinations *= count
+
+    hand_strength = calculate_hand_strength(all_cards)
+    percentile_strength = (hand_strength / total_combinations) * 100
+
+    return f"Hand Strength: {hand_strength} (Percentile Strength: {percentile_strength:.2f}%)"
 
 
 # Recursive Approach Using Graphs
