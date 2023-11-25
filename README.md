@@ -14,10 +14,10 @@ You must use a data set that has at least 100,000 tuples or rows or data points 
 <br>
 
 ## UPDATE:
-Frontend essentially complete. Takes user input for hand_cards and optional table_cards. Algo1 or Algo2 is called using these parameters to generate the output to be displayed in the frontend.
+Frontend is fundamentally complete. It takes user input for hand_cards and optional table_cards. Algo1 or Algo2 is called using these parameters to generate output.
 
 TO DO: The plan is to implement Combinatorial Analysis algorithms to output a percentile for the user's hand among all possible poker hand combinations (taking into account 0 to 5 provided table cards).
-- 1. Iterative Approach Using Hash Tables
-- 2. Recursive Approach Using Graphs
+- Iterative Approach Using Hash Tables
+- Recursive Approach Using Graphs
 
-If 3 table cards are input along w the user's hand (2 cards), we can output an additional percentile based on the user's input vs the poker dataset of 5 card combos.
+If 3 table cards are input along w the user's 2 hand cards, we can output an additional percentile based on the user's input vs the poker dataset of 5 card combos.
