@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
 from itertools import combinations
+import csv
+import time
 
 app = Flask(__name__)
 
@@ -19,6 +21,8 @@ class Card:
 # Tie-breakers are calculated using the card ranks as decimals (0/13 to 12/13),
 # with subsequent tiebreak cards descending in magnitude if applicable (1/13, 1/(13^2), 1/(13^3), etc).
 # By Geoffrey Clark
+
+
 def evaluate_hand(hand):
     # Sort the hand by rank with Ace as the highest
     ranks_order = '23456789TJQKA'
@@ -117,60 +121,35 @@ def evaluate_hand(hand):
     return strength_value
 
 
+# <---------------------------------------------->
 # Two different types of combinatorial analysis
 
-# <---------------------------------------------->
+
 # Iterative Approach Using Hash Tables
-# def algorithm1(hand_cards, table_cards=[]):
-#     card_values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13,
-#                    'A': 14}
+# Currently required 2 hand cards and >= 3 table cards. TODO: Add logic to handle 0-2 table cards.
+hand_strengths = {}
+with open('poker_hands.csv', newline='') as file:
+    reader = csv.reader(file)
+    next(reader)  # Skip the header
+    for row in reader:
+        hand_strengths[row[0]] = float(row[1])
+        # Pre-made dataset took 36.50181007385254 seconds to generate + evaluate all 2,598,960 possible 5 card hand combinations.
 
-#     def calculate_hand_strength(hand):
-#         sorted_hand = sorted(
-#             hand, key=lambda card: card_values[card.rank], reverse=True)
-#         values = [card_values[card.rank] for card in sorted_hand]
 
-#         is_straight = (values[0] - values[4] ==
-#                        4) or (values == [14, 5, 4, 3, 2])
+def algorithm1(hand_cards, table_cards=[]):
+    start_time = time.time()
+    best_strength = 0
+    all_possible_hands = combinations(hand_cards + table_cards, 5)
 
-#         is_flush = len(set(card.suit for card in sorted_hand)) == 1
+    for hand in all_possible_hands:
+        hand_key = ''.join(sorted([card.__repr__() for card in hand]))
+        hand_strength = hand_strengths.get(hand_key, 0)
+        best_strength = max(best_strength, hand_strength)
 
-#         if is_straight and is_flush:
-#             return 9  # straight flush
-#         elif values.count(values[0]) == 4 or values.count(values[1]) == 4:
-#             return 8  # four of a kind
-#         elif values.count(values[0]) == 3 and values.count(values[3]) == 2:
-#             return 7  # full house
-#         elif is_flush:
-#             return 6  # flush
-#         elif is_straight:
-#             return 5  # straight
-#         elif values.count(values[0]) == 3:
-#             return 4  # three of a kind
-#         elif values.count(values[0]) == 2 and values.count(values[2]) == 2:
-#             return 3  # two pair
-#         elif values.count(values[0]) == 2:
-#             return 2  # one pair
-#         else:
-#             return 1  # high card
-
-#     all_cards = hand_cards + table_cards
-#     combinations_count = {}
-
-#     for card in all_cards:
-#         if card.rank in combinations_count:
-#             combinations_count[card.rank] += 1
-#         else:
-#             combinations_count[card.rank] = 1
-
-#     total_combinations = 1
-#     for count in combinations_count.values():
-#         total_combinations *= count
-
-#     hand_strength = calculate_hand_strength(all_cards)
-#     percentile_strength = (hand_strength / total_combinations) * 100
-
-#     return f"Hand Strength: {hand_strength} (Percentile Strength: {percentile_strength:.2f}%)"
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"Algo1 execution time: {execution_time} seconds.")
+    return f"Best Hand Strength: {best_strength:.2f}"
 
 
 # <---------------------------------------------->

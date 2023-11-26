@@ -1,6 +1,9 @@
 
 import itertools
 import csv
+import time
+
+start_time = time.time()
 
 
 class Card:
@@ -139,3 +142,7 @@ with open('poker_hands.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(['Hand', 'Strength'])  # Writing the header
     writer.writerows(hands_data)
+
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Execution time: {execution_time} seconds")
