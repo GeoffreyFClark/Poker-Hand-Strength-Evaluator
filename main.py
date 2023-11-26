@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
 from itertools import combinations
+from Custom_Dataset_of_all_5_card_poker_hands.5Card_PokerHand_Dataset_Generator.py 
+import evaluate_hand
 import csv
 import time
 
@@ -43,17 +45,34 @@ def calculate_percentile(best_strength, hand_strengths):
     percentile = (less_or_equal_count / total_hands) * 100
     return percentile
 
+# algorithm2 functions
 def evaluate_hand(hand, hand_strengths):
     # Evaluates the strength of the current hand to be used in build_graph
-    return 0
+    sorted_hand = sorted(hand, key=card_sort_key)
+    hand_key = ''.join(sorted_hand)
+    return hand_strengths.get(hand_key, 0)
 
 def build_graph(hand_cards, table_cards):
     # Graphs possible movies in a Poker game
-    return {}
+    graph = {}
+    combined_cards = hand_cards + table_cards
+
+    for card in combined_cards:
+        potential_hand = combined_cards.copy()
+        potential_hand.remove(card)
+        strength = evaluate_hand(potential_hand, hand_strengths)
+        graph[tuple(potential_hand)] = strength
+
+    return graph
 
 def dfs(graph, current_hand, best_strength):
     # Depth-first recursive function to explore all possible paths to find maximum strength and only returns the maximum found
-    return 0
+    for card in graph:
+        new_hand = current_hand + [card]
+        new_strength = graph[card]
+        best_strength = max(best_strength, new_strength)
+        best_strength = dfs(graph, new_hand, best_strength)
+    return best_strength
 
 def algorithm1(hand_cards, table_cards=[]):
     start_time = time.time()
@@ -82,6 +101,9 @@ def algorithm2(hand_cards, table_cards=[]):
     start_time = time.time()
 
     # Run build_graph, dfs, and calculate_percentile functions here
+    graph = build_graph(hand_cards, table_cards)
+    best_strength = dfs(graph, [], 0)
+    percentile = calculate_percentile(best_strength, hand_strengths)
 
     end_time = time.time()
     execution_time = end_time - start_time
