@@ -16,119 +16,13 @@ class Card:
 
 
 # <---------------------------------------------->
-# This algorithm evaluates the strength of a 5-card poker hand, using a numeric value system that incorporates tie-breakers.
-# The base strength of each hand type (e.g., pair, straight) is represented as a whole number.
-# Tie-breakers are calculated using the card ranks as decimals (0/13 to 12/13),
-# with subsequent tiebreak cards descending in magnitude if applicable (1/13, 1/(13^2), 1/(13^3), etc).
-# By Geoffrey Clark
-
-
-def evaluate_hand(hand):
-    # Sort the hand by rank with Ace as the highest
-    ranks_order = '23456789TJQKA'
-    hand = sorted(hand, key=lambda card: ranks_order.index(
-        card.rank), reverse=True)
-
-    # Assign numerical values to each card rank for the tiebreaker calculation
-    rank_values = {rank: (1/13) * i for i, rank in enumerate(ranks_order)}
-
-    # Initialize dictionaries to count occurrences of each rank and suit
-    rank_counts = {rank: 0 for rank in ranks_order}
-    suit_counts = {suit: 0 for suit in 'HDCS'}
-
-    # Populate the dictionaries with the counts
-    for card in hand:
-        rank_counts[card.rank] += 1
-        suit_counts[card.suit] += 1
-
-    # Determine if the hand is a flush (all cards of the same suit)
-    is_flush = max(suit_counts.values()) == 5
-
-    # Check for a straight and a royal flush
-    is_straight = False
-    is_royal = False
-    sorted_ranks = sorted(hand, key=lambda card: ranks_order.index(card.rank))
-    sorted_ranks_str = ''.join(card.rank for card in sorted_ranks)
-    if sorted_ranks_str in ranks_order:
-        is_straight = True
-        if sorted_ranks_str == 'TJQKA':
-            is_royal = True
-
-    # Special case for low-Ace straight
-    if sorted_ranks_str == '2345A':
-        is_straight = True
-
-    # Calculate the hand's strength value
-    strength_value = 0
-
-    # Royal Flush
-    if is_royal and is_flush:
-        strength_value = 10
-    # Straight Flush
-    elif is_straight and is_flush:
-        strength_value = 9 + rank_values[sorted_ranks[-1].rank] / 13
-    # Four of a Kind
-    elif 4 in rank_counts.values():
-        four_of_a_kind_rank = max(
-            rank for rank, count in rank_counts.items() if count == 4)
-        strength_value = 8 + rank_values[four_of_a_kind_rank] / 13
-        # Further tiebreaking logic not applicable (same for 3 of a kind)
-        # e.g. Two players aren't going to tie by both having a 4 of a kind with the same rank
-    # Full House
-    elif 3 in rank_counts.values() and 2 in rank_counts.values():
-        three_kind_rank = max(
-            rank for rank, count in rank_counts.items() if count == 3)
-        pair_rank = max(
-            rank for rank, count in rank_counts.items() if count == 2)
-        strength_value = 7 + \
-            (rank_values[three_kind_rank] + rank_values[pair_rank] / 13) / 13
-    # Flush
-    elif is_flush:
-        strength_value = 6
-        for i, card in enumerate(sorted(hand, key=lambda card: rank_values[card.rank], reverse=True)):
-            strength_value += rank_values[card.rank] / (13 ** (i + 1))
-    # Straight
-    elif is_straight:
-        strength_value = 5 + rank_values[sorted_ranks[-1].rank] / 13
-    # Three of a Kind
-    elif 3 in rank_counts.values():
-        three_kind_rank = max(
-            rank for rank, count in rank_counts.items() if count == 3)
-        strength_value = 4 + rank_values[three_kind_rank] / 13
-    # Two Pair
-    elif list(rank_counts.values()).count(2) == 2:
-        pairs = sorted(
-            (rank for rank in rank_counts if rank_counts[rank] == 2), key=lambda rank: rank_values[rank], reverse=True)
-        strength_value = 3
-        for i, rank in enumerate(pairs):
-            strength_value += rank_values[rank] / (13 ** (i + 1))
-    # One Pair
-    elif 2 in rank_counts.values():
-        pair_rank = max(
-            rank for rank, count in rank_counts.items() if count == 2)
-        strength_value = 2 + rank_values[pair_rank] / 13
-        # Use other hand cards as tie breakers
-        remaining_cards = sorted(
-            (card for card in hand if rank_counts[card.rank] == 1), key=lambda card: ranks_order.index(card.rank), reverse=True)
-        for i, card in enumerate(remaining_cards):
-            strength_value += rank_values[card.rank] / (13 ** (i + 2))
-    # High Card
-    else:
-        strength_value = 1
-        for i, card in enumerate(sorted(hand, key=lambda card: rank_values[card.rank], reverse=True)):
-            strength_value += rank_values[card.rank] / (13 ** (i + 1))
-
-    return strength_value
-
-
-# <---------------------------------------------->
 # Two different types of combinatorial analysis
 
 
 # Iterative Approach Using Hash Tables
-# Currently required 2 hand cards and >= 3 table cards. TODO: Add logic to handle 0-2 table cards.
+# Currently requires 2 hand cards and >= 3 table cards. TODO: Add logic to handle 0-2 table cards.
 hand_strengths = {}
-with open('poker_hands.csv', newline='') as file:
+with open('Custom_Dataset_of_all_5_card_poker_hands/poker_hands.csv', newline='') as file:
     reader = csv.reader(file)
     next(reader)  # Skip the header
     for row in reader:
@@ -136,20 +30,40 @@ with open('poker_hands.csv', newline='') as file:
         # Pre-made dataset took 36.50181007385254 seconds to generate + evaluate all 2,598,960 possible 5 card hand combinations.
 
 
+def card_sort_key(card):
+    rank_order = '23456789TJQKA'
+    suit_order = 'HDCS'
+    return (rank_order.index(card[0]), suit_order.index(card[1]))
+
+
+def calculate_percentile(best_strength, hand_strengths):
+    less_or_equal_count = sum(
+        1 for strength in hand_strengths.values() if strength <= best_strength)
+    total_hands = len(hand_strengths)
+    percentile = (less_or_equal_count / total_hands) * 100
+    return percentile
+
+
 def algorithm1(hand_cards, table_cards=[]):
     start_time = time.time()
+
     best_strength = 0
-    all_possible_hands = combinations(hand_cards + table_cards, 5)
+    combined_cards = hand_cards + table_cards
+    all_possible_hands = combinations(combined_cards, 5)
 
     for hand in all_possible_hands:
-        hand_key = ''.join(sorted([card.__repr__() for card in hand]))
+        # Sort each hand correctly
+        sorted_hand = sorted(hand, key=card_sort_key)
+        hand_key = ''.join(sorted_hand)
         hand_strength = hand_strengths.get(hand_key, 0)
         best_strength = max(best_strength, hand_strength)
 
+    percentile = calculate_percentile(best_strength, hand_strengths)
+
     end_time = time.time()
     execution_time = end_time - start_time
-    print(f"Algo1 execution time: {execution_time} seconds.")
-    return f"Best Hand Strength: {best_strength:.2f}"
+
+    return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
 
 
 # <---------------------------------------------->
