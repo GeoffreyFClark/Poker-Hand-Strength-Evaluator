@@ -43,6 +43,17 @@ def calculate_percentile(best_strength, hand_strengths):
     percentile = (less_or_equal_count / total_hands) * 100
     return percentile
 
+def evaluate_hand(hand, hand_strengths):
+    # Evaluates the strength of the current hand to be used in build_graph
+    return 0
+
+def build_graph(hand_cards, table_cards):
+    # Graphs possible movies in a Poker game
+    return {}
+
+def dfs(graph, current_hand, best_strength):
+    # Depth-first recursive function to explore all possible paths to find maximum strength and only returns the maximum found
+    return 0
 
 def algorithm1(hand_cards, table_cards=[]):
     start_time = time.time()
@@ -65,12 +76,17 @@ def algorithm1(hand_cards, table_cards=[]):
 
     return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
 
-
 # <---------------------------------------------->
 # Recursive Approach Using Graphs
 def algorithm2(hand_cards, table_cards=[]):
-    return "Output from algorithm2"
+    start_time = time.time()
 
+    # Run build_graph, dfs, and calculate_percentile functions here
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+
+    return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
 
 # <---------------------------------------------->
 # Flask routes to handle GET and POST requests.
