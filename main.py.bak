@@ -19,7 +19,6 @@ class Card:
 
 # <---------------------------------------------->
 # Two different types of combinatorial analysis
-# TODO: Seperate algorithm1 and algorithm2
 
 
 # Iterative Approach Using Hash Tables
