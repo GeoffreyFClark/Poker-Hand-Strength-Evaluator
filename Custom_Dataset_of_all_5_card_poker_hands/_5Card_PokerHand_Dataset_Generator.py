@@ -1,9 +1,6 @@
-
 import itertools
 import csv
 import time
-
-start_time = time.time()
 
 
 class Card:
@@ -118,31 +115,38 @@ def evaluate_hand(hand):
     return strength_value
 
 
-# Generate a standard deck of cards
-suits = ['H', 'D', 'C', 'S']
-ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
-deck = [Card(rank, suit) for suit in suits for rank in ranks]
+def main():
+    start_time = time.time()
 
-# Generate all possible 5-card combinations
-five_card_combinations = itertools.combinations(deck, 5)
+    # Generate a standard deck of cards
+    suits = ['H', 'D', 'C', 'S']
+    ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
+    deck = [Card(rank, suit) for suit in suits for rank in ranks]
 
-# Evaluate each hand and store in a list
-hands_data = []
-z = 0
-for hand in five_card_combinations:
-    z += 1
-    if z % 10000 == 0:
-        print(f'{z} hands processed.')
-    hand_strength = evaluate_hand(hand)
-    hands_data.append((''.join(map(str, hand)), hand_strength))
-print(f'{z} hands evaluated in total.')
+    # Generate all possible 5-card combinations
+    five_card_combinations = itertools.combinations(deck, 5)
 
-# Write the data to a CSV file
-with open('poker_hands.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow(['Hand', 'Strength'])  # Writing the header
-    writer.writerows(hands_data)
+    # Evaluate each hand and store in a list
+    hands_data = []
+    z = 0
+    for hand in five_card_combinations:
+        z += 1
+        if z % 10000 == 0:
+            print(f'{z} hands processed.')
+        hand_strength = evaluate_hand(hand)
+        hands_data.append((''.join(map(str, hand)), hand_strength))
+    print(f'{z} hands evaluated in total.')
 
-end_time = time.time()
-execution_time = end_time - start_time
-print(f"Execution time: {execution_time} seconds")
+    # Write the data to a CSV file
+    with open('poker_hands.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Hand', 'Strength'])  # Writing the header
+        writer.writerows(hands_data)
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"Execution time: {execution_time} seconds")
+
+
+if __name__ == "__main__":
+    main()

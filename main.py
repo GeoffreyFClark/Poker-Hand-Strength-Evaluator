@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request
 from itertools import combinations
-from Custom_Dataset_of_all_5_card_poker_hands.5Card_PokerHand_Dataset_Generator.py 
-import evaluate_hand
+from Custom_Dataset_of_all_5_card_poker_hands._5Card_PokerHand_Dataset_Generator import evaluate_hand
 import csv
 import time
 
@@ -17,13 +16,6 @@ class Card:
         return f"{self.rank}{self.suit}"
 
 
-# <---------------------------------------------->
-# Two different types of combinatorial analysis
-# TODO: Seperate algorithm1 and algorithm2
-
-
-# Iterative Approach Using Hash Tables
-# Currently requires 2 hand cards and >= 3 table cards. TODO: Add logic to handle 0-2 table cards.
 hand_strengths = {}
 with open('Custom_Dataset_of_all_5_card_poker_hands/poker_hands.csv', newline='') as file:
     reader = csv.reader(file)
@@ -31,6 +23,14 @@ with open('Custom_Dataset_of_all_5_card_poker_hands/poker_hands.csv', newline=''
     for row in reader:
         hand_strengths[row[0]] = float(row[1])
         # Pre-made dataset took 36.50181007385254 seconds to generate + evaluate all 2,598,960 possible 5 card hand combinations.
+
+
+# <---------------------------------------------->
+# Two different types of combinatorial analysis
+# <---------------------------------------------->
+
+# 1. (Combinatorial Analysis) Iterative Approach Using Hash Tables
+# Currently requires 2 hand cards and >= 3 table cards. TODO: Add logic to handle 0-2 table cards.
 
 
 def card_sort_key(card):
@@ -46,34 +46,6 @@ def calculate_percentile(best_strength, hand_strengths):
     percentile = (less_or_equal_count / total_hands) * 100
     return percentile
 
-# algorithm2 functions
-def evaluate_hand(hand, hand_strengths):
-    # Evaluates the strength of the current hand to be used in build_graph
-    sorted_hand = sorted(hand, key=card_sort_key)
-    hand_key = ''.join(sorted_hand)
-    return hand_strengths.get(hand_key, 0)
-
-def build_graph(hand_cards, table_cards):
-    # Graphs possible movies in a Poker game
-    graph = {}
-    combined_cards = hand_cards + table_cards
-
-    for card in combined_cards:
-        potential_hand = combined_cards.copy()
-        potential_hand.remove(card)
-        strength = evaluate_hand(potential_hand, hand_strengths)
-        graph[tuple(potential_hand)] = strength
-
-    return graph
-
-def dfs(graph, current_hand, best_strength):
-    # Depth-first recursive function to explore all possible paths to find maximum strength and only returns the maximum found
-    for card in graph:
-        new_hand = current_hand + [card]
-        new_strength = graph[card]
-        best_strength = max(best_strength, new_strength)
-        best_strength = dfs(graph, new_hand, best_strength)
-    return best_strength
 
 def algorithm1(hand_cards, table_cards=[]):
     start_time = time.time()
@@ -97,23 +69,57 @@ def algorithm1(hand_cards, table_cards=[]):
     return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
 
 # <---------------------------------------------->
-# Recursive Approach Using Graphs
+
+# 2. (Combinatorial Analysis) Recursive Approach Using Graphs
+
+
+class HandNode:
+    def __init__(self, card_objects):
+        self.cards = card_objects
+        self.strength = evaluate_hand(self.cards)
+
+
+def build_graph(hand_cards, table_cards):
+    graph = {}
+    all_cards = hand_cards + table_cards
+    for hand_combination in combinations(all_cards, 5):
+        graph[hand_combination] = HandNode(list(hand_combination))
+    return graph
+
+
+def find_best_hand(graph):
+    return max(graph.values(), key=lambda node: node.strength)
+
+
+def calculate_percentile_algorithm2(best_strength, all_hand_strengths):
+    less_or_equal_count = sum(
+        1 for strength in all_hand_strengths if strength <= best_strength)
+    total_hands = len(all_hand_strengths)
+    percentile = (less_or_equal_count / total_hands) * 100
+    return percentile
+
+
 def algorithm2(hand_cards, table_cards=[]):
     start_time = time.time()
 
-    # Run build_graph, dfs, and calculate_percentile functions here
-    graph = build_graph(hand_cards, table_cards)
-    best_strength = dfs(graph, [], 0)
-    percentile = calculate_percentile(best_strength, hand_strengths)
+    # Convert string representations to Card objects
+    hand_cards_objects = [Card(card[:-1], card[-1]) for card in hand_cards]
+    table_cards_objects = [Card(card[:-1], card[-1]) for card in table_cards]
+    graph = build_graph(hand_cards_objects, table_cards_objects)
+
+    best_hand_strength = max(node.strength for node in graph.values())
+    percentile = calculate_percentile_algorithm2(
+        best_hand_strength, list(hand_strengths.values()))
 
     end_time = time.time()
     execution_time = end_time - start_time
-
     return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
 
 # <---------------------------------------------->
 # Flask routes to handle GET and POST requests.
 # Take user inputs, call algorithms, display result
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     output = ""
@@ -137,6 +143,5 @@ def index():
     return render_template('index.html', output=output)
 
 
-# Run Flask app. Debug mode currently on.
 if __name__ == "__main__":
     app.run(debug=True)
