@@ -36,6 +36,19 @@ with open('Custom_Dataset_of_all_5_card_poker_hands/poker_hands.csv', newline=''
 def card_sort_key(card):
     rank_order = '23456789TJQKA'
     suit_order = 'HDCS'
+
+    try:
+        rank_index = rank_order.index(card[0])
+    except ValueError:
+        print(f"Error: Rank '{card[0]}' not found in rank_order.")
+        rank_index = 0
+
+    try:
+        suit_index = suit_order.index(card[1])
+    except ValueError:
+        print(f"Error: Suit '{card[1]}' not found in suit_order.")
+        suit_index = 0
+
     return (rank_order.index(card[0]), suit_order.index(card[1]))
 
 
@@ -55,8 +68,10 @@ def algorithm1(hand_cards, table_cards=[]):
     all_possible_hands = combinations(combined_cards, 5)
 
     for hand in all_possible_hands:
-        # Sort each hand correctly
-        sorted_hand = sorted(hand, key=card_sort_key)
+        converted_hand = [f'T{card[2:]}' if card.startswith('10') else card for card in hand]
+
+        sorted_hand = sorted(converted_hand, key=card_sort_key)
+
         hand_key = ''.join(sorted_hand)
         hand_strength = hand_strengths.get(hand_key, 0)
         best_strength = max(best_strength, hand_strength)
