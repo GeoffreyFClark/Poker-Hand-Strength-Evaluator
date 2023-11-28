@@ -85,7 +85,7 @@ def algorithm1(hand_cards, table_cards=[]):
 
 # <---------------------------------------------->
 
-# 2. (Combinatorial Analysis) Recursive Approach Using Graphs
+# 2. DFS Recursive Approach Using Graphs
 
 
 class HandNode:
@@ -114,20 +114,36 @@ def calculate_percentile_algorithm2(best_strength, all_hand_strengths):
     return percentile
 
 
+def dfs(graph, current_combination, visited, best_strength):
+    visited[current_combination] = True
+
+    current_node = graph[current_combination]
+    current_strength = current_node.strength
+    best_strength[0] = max(best_strength[0], current_strength)
+
+    for neighbor in graph:
+        if not visited[neighbor]:
+            dfs(graph, neighbor, visited, best_strength)
+
 def algorithm2(hand_cards, table_cards=[]):
     start_time = time.time()
 
-    # Convert string representations to Card objects
     hand_cards_objects = [Card(card[:-1], card[-1]) for card in hand_cards]
     table_cards_objects = [Card(card[:-1], card[-1]) for card in table_cards]
     graph = build_graph(hand_cards_objects, table_cards_objects)
 
-    best_hand_strength = max(node.strength for node in graph.values())
+    best_strength = [0]
+
+    for start_node in graph:
+        visited = {node: False for node in graph}
+        dfs(graph, start_node, visited, best_strength)
+
     percentile = calculate_percentile_algorithm2(
-        best_hand_strength, list(hand_strengths.values()))
+        best_strength[0], list(hand_strengths.values()))
 
     end_time = time.time()
     execution_time = end_time - start_time
+
     return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
 
 # <---------------------------------------------->
