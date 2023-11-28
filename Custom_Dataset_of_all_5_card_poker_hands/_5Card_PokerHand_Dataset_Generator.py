@@ -18,8 +18,6 @@ class Card:
 # with subsequent tiebreak cards descending in magnitude if applicable (1/13, 1/(13^2), 1/(13^3), etc).
 # By Geoffrey Clark
 def evaluate_hand(hand):
-    hand = [Card('T', card.suit) if card.rank == '10' else card for card in hand]
-
     # Sort the hand by rank with Ace as the highest
     ranks_order = '23456789TJQKA'
     hand = sorted(hand, key=lambda card: ranks_order.index(
