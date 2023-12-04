@@ -138,8 +138,19 @@
         {% for suit in ["H", "C", "D", "S"] %}
             <ul>
                 {% for rank in ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"] %}
-                    <li onclick="setCardValue('{{ rank + suit }}')">
-                        <img src="{{ url_for('static', filename='card_images/' + rank + suit + '.png') }}" alt="{{ rank + suit }}" data-card="{{ rank + suit }}">
+                    {% set card_code = rank + suit %}
+                    {% set image_file = card_code + '.png' %}
+                    {% set alt_text = card_code %}
+                    {% set onclick_value = card_code %}
+                    
+                    {% if card_code == 'AD' %}
+                        {% set image_file = 'AceOfDiamonds.png' %}
+                        {% set alt_text = 'Ace of Diamonds' %}
+                        {% set onclick_value = 'AceOfDiamonds' %}
+                    {% endif %}
+                    
+                    <li onclick="setCardValue('{{ onclick_value }}')">
+                        <img src="{{ url_for('static', filename='card_images/' + image_file) }}" alt="{{ alt_text }}" data-card="{{ card_code }}">
                     </li>
                 {% endfor %}
             </ul>
@@ -178,10 +189,10 @@
         }
 
         function getCardImageFilename(card) {
-            if (card === 'AD') {
-                return 'AceOfDiamonds.png';  // New filename for Ace of Diamonds since AD.png triggers adblockers
+            if (card === 'AceOfDiamonds') { 
+                return 'AceOfDiamonds.png';  
             }
-            return card + '.png'; // Original naming convention for other cards
+            return card + '.png'; 
         }
 
 
