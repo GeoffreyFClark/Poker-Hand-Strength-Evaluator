@@ -177,6 +177,14 @@
             }
         }
 
+        function getCardImageFilename(card) {
+            if (card === 'AD') {
+                return 'AceOfDiamonds.png';  // New filename for Ace of Diamonds since AD.png triggers adblockers
+            }
+            return card + '.png'; // Original naming convention for other cards
+        }
+
+
         function setCardValue(card) {
             if (selectedInput) {
                 // Prevent selection in selection grid if card is already in use
@@ -190,7 +198,7 @@
                 }
                 // Set the new card value
                 selectedInput.value = card;
-                selectedInput.style.backgroundImage = `url('static/card_images/${card}.png')`;
+                selectedInput.style.backgroundImage = `url('static/card_images/${getCardImageFilename(card)}')`;
                 selectedCards[selectedInput.name] = card;
                 // Add 'selected' class to the new card image to white it out
                 document.querySelector(`img[data-card="${card}"]`).classList.add('selected');
