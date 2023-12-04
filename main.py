@@ -25,14 +25,6 @@ with open('Custom_Dataset_of_all_5_card_poker_hands/poker_hands.csv', newline=''
         # Pre-made dataset took 36.50181007385254 seconds to generate + evaluate all 2,598,960 possible 5 card hand combinations.
 
 
-# <---------------------------------------------->
-# Two different types of combinatorial analysis
-# <---------------------------------------------->
-
-# 1. (Combinatorial Analysis) Iterative Approach Using Hash Tables
-# Currently requires 2 hand cards and >= 3 table cards. TODO: Add logic to handle 0-2 table cards.
-
-
 def card_sort_key(card):
     rank_order = '23456789TJQKA'
     suit_order = 'HDCS'
@@ -61,90 +53,112 @@ def calculate_percentile(best_strength, hand_strengths):
     return percentile
 
 
+# <---------------------------------------------->
+# Two different types of combinatorial algorithms
+# <---------------------------------------------->
+
+
+# 1. Combinatorial Algo using a stack to ITERATIVELY create all possible hands using 2 hole cards + table cards,
+# then custom algo to identify strongest hand, and custom dataset hashtable lookup to calculate percentile.
+
+
+# This is a custom iterative implementation without using itertools to generate all possible combinations of n cards from the given list of cards.
+def all_combinations_iterative(cards, n):
+    result = []
+    # Stack holds tuples of (index, current_combination), initialized with (0, empty list)
+    stack = [(0, [])]
+
+    # while loop continues iteratively as long as there's an item in the stack
+    while stack:
+        # Pop the last item from the stack
+        index, current = stack.pop()
+
+        # If the current combination has n cards, add it to the result list and continue
+        if len(current) == n:
+            result.append(current)
+            continue
+
+        for next_index in range(index, len(cards)):
+            # For every remaining card in the list, create a new combination by adding it as the next card.
+            new_combination = current + [cards[next_index]]
+
+            # Prepare for the next iteration. The next_index + 1 ensures that in the next iteration,
+            # we will be looking at the next card in the list, avoiding repetition of the current card.
+            next_iteration_start_index = next_index + 1
+
+            # Add this new combination and the index for the next iteration to the stack.
+            stack.append((next_iteration_start_index, new_combination))
+
+    return result
+
+
 def algorithm1(hand_cards, table_cards=[]):
     start_time = time.time()
 
     best_strength = 0
     combined_cards = hand_cards + table_cards
-    all_possible_hands = combinations(combined_cards, 5)
+    all_possible_hands = all_combinations_iterative(combined_cards, 5)
 
     for hand in all_possible_hands:
         sorted_hand = sorted(hand, key=card_sort_key)
-
         hand_key = ''.join(sorted_hand)
         hand_strength = hand_strengths.get(hand_key, 0)
         best_strength = max(best_strength, hand_strength)
 
     percentile = calculate_percentile(best_strength, hand_strengths)
-
     end_time = time.time()
     execution_time = end_time - start_time
 
-    return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
+    return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \
+    \n Execution time: {execution_time:.4f} seconds."
+
 
 # <---------------------------------------------->
 
-# 2. DFS Recursive Approach Using Graphs
+
+# 1. Combinatorial Algo to RECURSIVELY create all possible hands using 2 hole cards + table cards,
+# then custom algo to identify strongest hand, and custom dataset hashtable lookup to calculate percentile.
 
 
-class HandNode:
-    def __init__(self, card_objects):
-        self.cards = card_objects
-        self.strength = evaluate_hand(self.cards)
+def all_combinations_recursive(cards, n, start=0, current=[]):
+    # base cases
+    if len(current) == n:  # If the current combination is n length, return it in a list
+        return [current]
+    if start == len(cards):  # If the end of the cards list is reached, return an empty list
+        return []
 
+    # Recursive call using the next card in the list and including the current card
+    include_current = all_combinations_recursive(
+        cards, n, start + 1, current + [cards[start]])
+    # Recursive call using the next card in the list without including the current card
+    exclude_current = all_combinations_recursive(
+        cards, n, start + 1, current)
 
-def build_graph(hand_cards, table_cards):
-    graph = {}
-    all_cards = hand_cards + table_cards
-    for hand_combination in combinations(all_cards, 5):
-        graph[hand_combination] = HandNode(list(hand_combination))
-    return graph
+    # Combine the results from both recursive calls
+    return include_current + exclude_current
 
-
-def find_best_hand(graph):
-    return max(graph.values(), key=lambda node: node.strength)
-
-
-def calculate_percentile_algorithm2(best_strength, all_hand_strengths):
-    less_or_equal_count = sum(
-        1 for strength in all_hand_strengths if strength <= best_strength)
-    total_hands = len(all_hand_strengths)
-    percentile = (less_or_equal_count / total_hands) * 100
-    return percentile
-
-
-def dfs(graph, current_combination, visited, best_strength):
-    visited[current_combination] = True
-
-    current_node = graph[current_combination]
-    current_strength = current_node.strength
-    best_strength[0] = max(best_strength[0], current_strength)
-
-    for neighbor in graph:
-        if not visited[neighbor]:
-            dfs(graph, neighbor, visited, best_strength)
 
 def algorithm2(hand_cards, table_cards=[]):
     start_time = time.time()
+    best_strength = 0
+    combined_cards = hand_cards + table_cards
+    all_possible_hands = all_combinations_recursive(combined_cards, 5)
 
-    hand_cards_objects = [Card(card[:-1], card[-1]) for card in hand_cards]
-    table_cards_objects = [Card(card[:-1], card[-1]) for card in table_cards]
-    graph = build_graph(hand_cards_objects, table_cards_objects)
+    for hand in all_possible_hands:
+        sorted_hand = sorted(hand, key=card_sort_key)
+        hand_key = ''.join(sorted_hand)
+        hand_strength = hand_strengths.get(hand_key, 0)
+        best_strength = max(best_strength, hand_strength)
 
-    best_strength = [0]
-
-    for start_node in graph:
-        visited = {node: False for node in graph}
-        dfs(graph, start_node, visited, best_strength)
-
-    percentile = calculate_percentile_algorithm2(
-        best_strength[0], list(hand_strengths.values()))
-
+    percentile = calculate_percentile(best_strength, hand_strengths)
     end_time = time.time()
     execution_time = end_time - start_time
 
-    return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
+    return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \
+    \n Execution time: {execution_time:.4f} seconds."
 
+
+# <---------------------------------------------->
 # <---------------------------------------------->
 # Flask routes to handle GET and POST requests.
 # Take user inputs, call algorithms, display result
