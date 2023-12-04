@@ -197,10 +197,13 @@
 
 
         function setCardValue(card) {
+            if (card === 'AD') {
+                card = 'AceOfDiamonds';
+            }
             if (selectedInput) {
                 // Prevent selection in selection grid if card is already in use
                 if (Object.values(selectedCards).includes(card)) {
-                    return; 
+                    return;
                 }
                 // If a card is already selected in this input, unselect it
                 if (selectedCards[selectedInput.name]) {
@@ -212,7 +215,10 @@
                 selectedInput.style.backgroundImage = `url('static/card_images/${getCardImageFilename(card)}')`;
                 selectedCards[selectedInput.name] = card;
                 // Add 'selected' class to the new card image to white it out
-                document.querySelector(`img[data-card="${card}"]`).classList.add('selected');
+                const selectedImage = document.querySelector(`img[data-card="${card}"]`) || document.querySelector(`img[data-card="AD"]`);
+                if (selectedImage) {
+                    selectedImage.classList.add('selected');
+                }
                 selectedInput = null;
             }
         }
