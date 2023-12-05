@@ -29,7 +29,7 @@ def card_to_string(card):
 
 
 hand_strengths = {}
-with open('Custom_Dataset_of_all_5_card_poker_hands/poker_hands.csv', newline='') as file:
+with open('Custom_Dataset_of_all_5_card_poker_hands/5card_poker_hands.csv', newline='') as file:
     reader = csv.reader(file)
     next(reader)  # Skip the header
     for row in reader:
@@ -108,18 +108,23 @@ def algorithm1(hand_cards, table_cards=[]):
     start_time = time.time()
 
     hand_cards_objects = [string_to_card(card) for card in hand_cards]
+    print(f"Hand cards objects: {hand_cards_objects}")  # Debug print
     table_cards_objects = [string_to_card(card) for card in table_cards]
+    print(f"Table cards objects: {table_cards_objects}")  # Debug print
     best_strength = 0
     combined_cards = hand_cards_objects + table_cards_objects
     all_possible_hands = all_combinations_iterative(combined_cards, 5)
+    print(f"Total possible hands: {len(all_possible_hands)}")  # Debug print
 
     for hand in all_possible_hands:
         sorted_hand = sorted(hand, key=card_sort_key)
         hand_key = ''.join(card_to_string(card) for card in sorted_hand)
         hand_strength = hand_strengths.get(hand_key, 0)
+        print(f"Hand: {'-'.join(card_to_string(card) for card in sorted_hand)}, Key: {hand_key}, Strength: {hand_strength}")  # Debug print
         best_strength = max(best_strength, hand_strength)
 
     percentile = calculate_percentile(best_strength, hand_strengths)
+    print(f"Best Strength: {best_strength}, Percentile: {percentile}%")  # Debug print
     end_time = time.time()
     execution_time = end_time - start_time
 

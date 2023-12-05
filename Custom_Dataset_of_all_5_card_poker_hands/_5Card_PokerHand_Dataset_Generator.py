@@ -134,7 +134,11 @@ def main():
         if z % 10000 == 0:
             print(f'{z} hands processed.')
         hand_strength = evaluate_hand(hand)
-        hands_data.append((''.join(map(str, hand)), hand_strength))
+
+        # Sort the hand by rank and then by suit
+        sorted_hand = sorted(hand, key=lambda card: (ranks.index(card.rank), suits.index(card.suit)))
+
+        hands_data.append((''.join(map(str, sorted_hand)), hand_strength))
     print(f'{z} hands evaluated in total.')
 
     # Write the data to a CSV file
@@ -146,7 +150,6 @@ def main():
     end_time = time.time()
     execution_time = end_time - start_time
     print(f"Execution time: {execution_time} seconds")
-
 
 if __name__ == "__main__":
     main()
