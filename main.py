@@ -34,7 +34,16 @@ with open('Custom_Dataset_of_all_5_card_poker_hands/5card_poker_hands.csv', newl
     next(reader)  # Skip the header
     for row in reader:
         hand_strengths[row[0]] = float(row[1])
-        # Pre-made dataset took 36.50181007385254 seconds to generate + evaluate all 2,598,960 possible 5 card hand combinations.
+        # Pre-made dataset took 36.50181007385254 seconds to generate + evaluate all 2,598,960 possible 5 card hand combinations using core i5 10300H @ 2.5GHz, 16GB RAM, 1TB SSD
+        # 22.071184396743774 seconds Ryzen 5 7600 @ 3.8Ghz, 16GB RAM, 1TB SSD
+
+two_card_hand_strengths = {}
+with open('Custom_Dataset_of_all_2_card_poker_hands/2card_poker_hands.csv', newline='') as file:
+    reader = csv.reader(file)
+    next(reader)  # Skip the header
+    for row in reader:
+        two_card_hand_strengths[row[0]] = float(row[1])
+        # Pre-made dataset took 0.000997304916381836 seconds to generate + evaluate all 1326 possible 2 card hand combinations.
 
 
 def card_sort_key(card):
@@ -64,6 +73,14 @@ def calculate_percentile(best_strength, hand_strengths):
     percentile = (less_or_equal_count / total_hands) * 100
     return percentile
 
+
+def calculate_percentile_two_card(hand_key, two_card_strengths):
+    best_strength = two_card_strengths[hand_key]
+    less_or_equal_count = sum(
+        1 for strength in two_card_strengths.values() if strength <= best_strength)
+    total_hands = len(two_card_strengths)
+    percentile = (less_or_equal_count / total_hands) * 100
+    return percentile
 
 # <---------------------------------------------->
 # Two different types of combinatorial algorithms
@@ -106,30 +123,34 @@ def all_combinations_iterative(cards, n):
 
 def algorithm1(hand_cards, table_cards=[]):
     start_time = time.time()
-
     hand_cards_objects = [string_to_card(card) for card in hand_cards]
-    print(f"Hand cards objects: {hand_cards_objects}")  # Debug print
     table_cards_objects = [string_to_card(card) for card in table_cards]
-    print(f"Table cards objects: {table_cards_objects}")  # Debug print
-    best_strength = 0
-    combined_cards = hand_cards_objects + table_cards_objects
-    all_possible_hands = all_combinations_iterative(combined_cards, 5)
-    print(f"Total possible hands: {len(all_possible_hands)}")  # Debug print
 
-    for hand in all_possible_hands:
-        sorted_hand = sorted(hand, key=card_sort_key)
+    if len(table_cards) < 3:
+        sorted_hand = sorted(hand_cards_objects, key=card_sort_key)
         hand_key = ''.join(card_to_string(card) for card in sorted_hand)
-        hand_strength = hand_strengths.get(hand_key, 0)
-        print(f"Hand: {'-'.join(card_to_string(card) for card in sorted_hand)}, Key: {hand_key}, Strength: {hand_strength}")  # Debug print
-        best_strength = max(best_strength, hand_strength)
+        percentile = calculate_percentile_two_card(
+            hand_key, two_card_hand_strengths)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        return f"Hand strength percentile among all 1,326 possible starting hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
+    else:
+        best_strength = 0
+        combined_cards = hand_cards_objects + table_cards_objects
+        all_possible_hands = all_combinations_iterative(combined_cards, 5)
 
-    percentile = calculate_percentile(best_strength, hand_strengths)
-    print(f"Best Strength: {best_strength}, Percentile: {percentile}%")  # Debug print
-    end_time = time.time()
-    execution_time = end_time - start_time
+        for hand in all_possible_hands:
+            sorted_hand = sorted(hand, key=card_sort_key)
+            hand_key = ''.join(card_to_string(card) for card in sorted_hand)
+            hand_strength = hand_strengths.get(hand_key, 0)
+            best_strength = max(best_strength, hand_strength)
 
-    return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \
-    \n Execution time: {execution_time:.4f} seconds."
+        percentile = calculate_percentile(best_strength, hand_strengths)
+        end_time = time.time()
+        execution_time = end_time - start_time
+
+        return f"Hand strength percentile among all 2,598,960 possible 5 card poker hands: {percentile:.4f}% \
+        \n Execution time: {execution_time:.4f} seconds."
 
 
 # <---------------------------------------------->
@@ -162,22 +183,32 @@ def algorithm2(hand_cards, table_cards=[]):
 
     hand_cards_objects = [string_to_card(card) for card in hand_cards]
     table_cards_objects = [string_to_card(card) for card in table_cards]
-    best_strength = 0
-    combined_cards = hand_cards_objects + table_cards_objects
-    all_possible_hands = all_combinations_recursive(combined_cards, 5)
 
-    for hand in all_possible_hands:
-        sorted_hand = sorted(hand, key=card_sort_key)
+    if len(table_cards) < 3:
+        sorted_hand = sorted(hand_cards_objects, key=card_sort_key)
         hand_key = ''.join(card_to_string(card) for card in sorted_hand)
-        hand_strength = hand_strengths.get(hand_key, 0)
-        best_strength = max(best_strength, hand_strength)
+        percentile = calculate_percentile_two_card(
+            hand_key, two_card_hand_strengths)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        return f"Hand strength percentile among all 1,326 possible starting hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
+    else:
+        best_strength = 0
+        combined_cards = hand_cards_objects + table_cards_objects
+        all_possible_hands = all_combinations_recursive(combined_cards, 5)
 
-    percentile = calculate_percentile(best_strength, hand_strengths)
-    end_time = time.time()
-    execution_time = end_time - start_time
+        for hand in all_possible_hands:
+            sorted_hand = sorted(hand, key=card_sort_key)
+            hand_key = ''.join(card_to_string(card) for card in sorted_hand)
+            hand_strength = hand_strengths.get(hand_key, 0)
+            best_strength = max(best_strength, hand_strength)
 
-    return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \
-    \n Execution time: {execution_time:.4f} seconds."
+        percentile = calculate_percentile(best_strength, hand_strengths)
+        end_time = time.time()
+        execution_time = end_time - start_time
+
+        return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \
+        \n Execution time: {execution_time:.4f} seconds."
 
 
 # <---------------------------------------------->
