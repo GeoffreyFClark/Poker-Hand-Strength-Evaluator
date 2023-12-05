@@ -17,11 +17,20 @@ hands = ['AA', 'KK', 'QQ', 'JJ', 'AK', 'TT', 'AK', 'AQ', '99', 'AJ', 'AQ', '88',
          '49', '2T', '39', '36', '29', '37', '25', '24', '38', '28', '26', '23',
          '27']
 
+rank_order = '23456789TJQKA'
+suit_order = 'HDCS'
+
+def sort_cards(card1, suit1, card2, suit2):
+    if rank_order.index(card1) > rank_order.index(card2) or \
+       (rank_order.index(card1) == rank_order.index(card2) and suit_order.index(suit1) > suit_order.index(suit2)):
+        return card2 + suit2 + card1 + suit1
+    return card1 + suit1 + card2 + suit2
+
 modified_dataset = OrderedDict()
 
 for card in hands:
     modified_card = [
-        card[0] + suit + card[1] + other_suit
+        sort_cards(card[0], suit, card[1], other_suit)
         for suit in ['S', 'C', 'D', 'H']
         for other_suit in ['S', 'C', 'D', 'H']
         if len(card) > 1 and other_suit != card[1] and card[0] + card[1] != card[2:] + other_suit
