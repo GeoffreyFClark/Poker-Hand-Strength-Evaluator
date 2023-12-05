@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-from itertools import combinations
 from Custom_Dataset_of_all_5_card_poker_hands._5Card_PokerHand_Dataset_Generator import evaluate_hand
 import csv
 import time
@@ -14,6 +13,19 @@ class Card:
 
     def __repr__(self):
         return f"{self.rank}{self.suit}"
+
+
+# Convert a two-character string to a Card object
+def string_to_card(card_str):
+
+    rank = card_str[0]
+    suit = card_str[1]
+    return Card(rank, suit)
+
+
+# Convert a Card object back to its string representation
+def card_to_string(card):
+    return card.rank + card.suit
 
 
 hand_strengths = {}
@@ -59,7 +71,7 @@ def calculate_percentile(best_strength, hand_strengths):
 
 
 # 1. Combinatorial Algo using a stack to ITERATIVELY create all possible hands using 2 hole cards + table cards,
-# then custom algo to identify strongest hand, and custom dataset hashtable lookup to calculate percentile.
+# then custom dataset hashtable lookup to identify strongest possible handle and calculate percentile.
 
 
 # This is a custom iterative implementation without using itertools to generate all possible combinations of n cards from the given list of cards.
@@ -95,13 +107,15 @@ def all_combinations_iterative(cards, n):
 def algorithm1(hand_cards, table_cards=[]):
     start_time = time.time()
 
+    hand_cards_objects = [string_to_card(card) for card in hand_cards]
+    table_cards_objects = [string_to_card(card) for card in table_cards]
     best_strength = 0
-    combined_cards = hand_cards + table_cards
+    combined_cards = hand_cards_objects + table_cards_objects
     all_possible_hands = all_combinations_iterative(combined_cards, 5)
 
     for hand in all_possible_hands:
         sorted_hand = sorted(hand, key=card_sort_key)
-        hand_key = ''.join(sorted_hand)
+        hand_key = ''.join(card_to_string(card) for card in sorted_hand)
         hand_strength = hand_strengths.get(hand_key, 0)
         best_strength = max(best_strength, hand_strength)
 
@@ -117,7 +131,7 @@ def algorithm1(hand_cards, table_cards=[]):
 
 
 # 1. Combinatorial Algo to RECURSIVELY create all possible hands using 2 hole cards + table cards,
-# then custom algo to identify strongest hand, and custom dataset hashtable lookup to calculate percentile.
+# then custom dataset hashtable lookup to identify strongest possible handle and calculate percentile.
 
 
 def all_combinations_recursive(cards, n, start=0, current=[]):
@@ -140,13 +154,16 @@ def all_combinations_recursive(cards, n, start=0, current=[]):
 
 def algorithm2(hand_cards, table_cards=[]):
     start_time = time.time()
+
+    hand_cards_objects = [string_to_card(card) for card in hand_cards]
+    table_cards_objects = [string_to_card(card) for card in table_cards]
     best_strength = 0
-    combined_cards = hand_cards + table_cards
+    combined_cards = hand_cards_objects + table_cards_objects
     all_possible_hands = all_combinations_recursive(combined_cards, 5)
 
     for hand in all_possible_hands:
         sorted_hand = sorted(hand, key=card_sort_key)
-        hand_key = ''.join(sorted_hand)
+        hand_key = ''.join(card_to_string(card) for card in sorted_hand)
         hand_strength = hand_strengths.get(hand_key, 0)
         best_strength = max(best_strength, hand_strength)
 
@@ -172,6 +189,12 @@ def index():
         hand_cards = [request.form.get('hand1'), request.form.get('hand2')]
         table_cards = [request.form.get(f'table{i}') for i in range(
             1, 6) if request.form.get(f'table{i}')]
+
+        # Replace 'AceOfDiamonds' with 'AD' in hand_cards and table_cards
+        hand_cards = ['AD' if card ==
+                      'AceOfDiamonds' else card for card in hand_cards]
+        table_cards = ['AD' if card ==
+                       'AceOfDiamonds' else card for card in table_cards]
 
         # check if both hand cards were entered
         if not all(hand_cards):
