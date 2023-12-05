@@ -5,17 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poker Hand Strength Calculator</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        html, body {
+            background-color: black;
+            height: 100%;
+            display: flex;
+            flex-direction: row; /* Align children in a row */
+            align-items: flex-start; /* Align children to the start of the cross axis */
+            background-color: black; /* Ensure the background is black */
+            padding: 3px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: black;
             color: white;
             display: flex;
             justify-content: space-between; /* Space between main content and card container */
-            padding: 20px; 
+            padding: 10px; 
+        }
+
+        label, select, button {
+            font-size: 2.3em; 
         }
 
         .main-content {
-            flex-grow: 1; 
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            width: 700px;
+            height: 800px;
+            border: 2px solid white;
+            box-sizing: border-box;
+            padding: 10px;
         }
 
         input[type="text"] {
@@ -24,6 +49,19 @@
             background-size: contain;
             background-repeat: no-repeat;
             border: 1px solid #ccc; 
+        }
+
+        .input-group {
+            display: inline-block; /* Align groups horizontally */
+            text-align: left; 
+            margin-right: 0px; /* Space between groups */
+        }
+
+        .input-label {
+            font-size: 1.30em;
+            display: block; /* Make label a block element to occupy full width */
+            margin-bottom: 0px; /* Space between label and input */
+            color: white; /* Or any color of your choice */
         }
 
         /* Style for the input boxes to display the card image */
@@ -39,6 +77,7 @@
         }
 
         .cards-container {
+            margin-left: 10px;
             display: grid; 
             grid-template-columns: repeat(4, 1fr); /* 4 columns, one for each suit */
             max-width: 300px; 
@@ -50,7 +89,7 @@
             list-style-type: none;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            /* align-items: center; */
         }
 
         .cards-container li {
@@ -59,7 +98,7 @@
         }
 
         .cards-container li img {
-            width: 35px; 
+            width: 34px; 
             cursor: pointer;
             transition: filter 0.3s;
             border: 1px solid #ccc;
@@ -75,6 +114,12 @@
             filter: grayscale(1); 
             pointer-events: none;  
         }
+
+        .output {
+            white-space: pre-line; 
+            margin: 4px;
+            font-size: 1.2em;
+        }
         
     </style>
 </head>
@@ -85,20 +130,35 @@
         <form action="/" method="POST">
 
             <!-- Section to select hand cards -->
-            <div style="margin-bottom: 25px;">
-                <label style="display: block; margin-bottom: 5px;">Your Hand:</label>
+            <label style="display: block; margin-bottom: 5px;">Hole Cards:</label>
+            <div style="margin-bottom: 30px; margin-left: 10px;">
                 <input type="text" name="hand1" class="card-input" readonly onclick="selectCard(this)">
                 <input type="text" name="hand2" class="card-input" readonly onclick="selectCard(this)">
             </div>
 
             <!-- Section to select table cards (if any) -->
-            <div style="margin-bottom: 25px;">
-                <label style="display: block; margin-bottom: 5px;">(Optional) Table Cards:</label>
-                <input type="text" name="table1" class="card-input" readonly onclick="selectCard(this)">
+            <label style="display: block; margin-bottom: 5px;">Table Cards:</label>
+            <div style="margin-bottom: 30px; margin-left: 10px">
+                <div class="input-group">
+                    <span class="input-label">FLOP</span>
+                    <input type="text" name="table1" class="card-input" readonly onclick="selectCard(this)">
+                </div>
+                <div class="input-group">
+                <span class="input-label">FLOP</span>
                 <input type="text" name="table2" class="card-input" readonly onclick="selectCard(this)">
-                <input type="text" name="table3" class="card-input" readonly onclick="selectCard(this)">
-                <input type="text" name="table4" class="card-input" readonly onclick="selectCard(this)">
-                <input type="text" name="table5" class="card-input" readonly onclick="selectCard(this)">
+                </div>
+                <div class="input-group" style="margin-right: 14px;">
+                    <span class="input-label">FLOP</span>
+                    <input type="text" name="table3" class="card-input" readonly onclick="selectCard(this)">
+                </div>
+                <div class="input-group" style="margin-right: 14px;">
+                    <span class="input-label">TURN</span>
+                    <input type="text" name="table4" class="card-input" readonly onclick="selectCard(this)">
+                </div>
+                <div class="input-group">
+                    <span class="input-label">RIVER</span>
+                    <input type="text" name="table5" class="card-input" readonly onclick="selectCard(this)">
+                </div>
             </div>
 
             <!-- Dropdown to select number of opponents
@@ -113,23 +173,22 @@
             </div> -->
 
             <!-- Dropdown to select evaluation algorithm -->
-            <div style="margin-bottom: 10px;">
+            <div style="margin-bottom: 20px;">
                 <label>Evaluation Method:</label>
-                <select name="evaluation">
+                <select name="evaluation" style="margin-left: 10px;">
                     <option value="algorithm1">algorithm1</option>
                     <option value="algorithm2">algorithm2</option>
                 </select>
             </div>
 
-            <div style="margin-bottom: 80px;">
+            <div style="margin-bottom: 35px;">
                 <button type="submit">CALCULATE!</button>
             </div>
 
-            <div>
+            <div style="margin-bottom: 20px">
                 <label>Result:</label>
-                <div>{{ output }}</div>
             </div>
-
+            <div class="output">{{ output }}</div>
         </form>
     </div>
 
@@ -219,8 +278,29 @@
                 if (selectedImage) {
                     selectedImage.classList.add('selected');
                 }
-                selectedInput = null;
+                selectedInput = getNextInput(selectedInput);
+                if (selectedInput) {
+                    selectedInput.focus();
+                }
+            }                
+        }
+
+        function getNextInput(currentInput) {
+            // Try to find the next input in the same section
+            let next = currentInput.nextElementSibling;
+            while (next && next.tagName !== 'INPUT') {
+                next = next.nextElementSibling;
             }
+            // If not found in the same section, move to the next section
+            if (!next) {
+                let nextSection = currentInput.parentElement.nextElementSibling;
+                while (nextSection) {
+                    next = nextSection.querySelector('input');
+                    if (next) break;
+                    nextSection = nextSection.nextElementSibling;
+                }
+            }
+            return next;
         }
 
         function clearCard(inputElement) {
@@ -234,7 +314,15 @@
             inputElement.value = '';
             inputElement.style.backgroundImage = 'none';
             delete selectedCards[inputElement.name];
+
+            selectedInput = inputElement;
         }
+
+        window.onload = function() {
+            let firstInput = document.querySelector('input[name="hand1"]');
+            firstInput.focus();
+            selectCard(firstInput); 
+        };
     </script>    
 </body>
 </html>

@@ -122,7 +122,7 @@ def all_combinations_iterative(cards, n):
 
 
 def algorithm1(hand_cards, table_cards=[]):
-    start_time = time.time()
+    start_time = time.perf_counter()
     hand_cards_objects = [string_to_card(card) for card in hand_cards]
     table_cards_objects = [string_to_card(card) for card in table_cards]
 
@@ -131,9 +131,12 @@ def algorithm1(hand_cards, table_cards=[]):
         hand_key = ''.join(card_to_string(card) for card in sorted_hand)
         percentile = calculate_percentile_two_card(
             hand_key, two_card_hand_strengths)
-        end_time = time.time()
+        end_time = time.perf_counter()
         execution_time = end_time - start_time
-        return f"Hand strength percentile among all 1,326 possible starting hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
+        return f"Hand: {sorted_hand} \
+            \n\n Execution time: {execution_time:.12f} seconds. \
+            \n\n Hand strength percentile among all 1,326 possible starting hands: \
+            \n{percentile:.4f}%"
     else:
         best_strength = 0
         combined_cards = hand_cards_objects + table_cards_objects
@@ -146,11 +149,13 @@ def algorithm1(hand_cards, table_cards=[]):
             best_strength = max(best_strength, hand_strength)
 
         percentile = calculate_percentile(best_strength, hand_strengths)
-        end_time = time.time()
+        end_time = time.perf_counter()
         execution_time = end_time - start_time
 
-        return f"Hand strength percentile among all 2,598,960 possible 5 card poker hands: {percentile:.4f}% \
-        \n Execution time: {execution_time:.4f} seconds."
+        return f"Hand: {sorted_hand} \
+            \n\n Execution time: {execution_time:.12f} seconds.\
+            \n\n Hand strength percentile among all 2,598,960 possible 5 card poker hands: \
+            \n{percentile:.4f}%"
 
 
 # <---------------------------------------------->
@@ -179,7 +184,7 @@ def all_combinations_recursive(cards, n, start=0, current=[]):
 
 
 def algorithm2(hand_cards, table_cards=[]):
-    start_time = time.time()
+    start_time = time.perf_counter()
 
     hand_cards_objects = [string_to_card(card) for card in hand_cards]
     table_cards_objects = [string_to_card(card) for card in table_cards]
@@ -189,9 +194,12 @@ def algorithm2(hand_cards, table_cards=[]):
         hand_key = ''.join(card_to_string(card) for card in sorted_hand)
         percentile = calculate_percentile_two_card(
             hand_key, two_card_hand_strengths)
-        end_time = time.time()
+        end_time = time.perf_counter()
         execution_time = end_time - start_time
-        return f"Hand strength percentile among all 1,326 possible starting hands: {percentile:.4f}% \n Execution time: {execution_time:.4f} seconds."
+        return f"Hand: {sorted_hand} \
+            \n\n Execution time: {execution_time:.12f} seconds. \
+            \n\n Hand strength percentile among all 1,326 possible starting hands: \
+            \n{percentile:.4f}%"
     else:
         best_strength = 0
         combined_cards = hand_cards_objects + table_cards_objects
@@ -204,11 +212,13 @@ def algorithm2(hand_cards, table_cards=[]):
             best_strength = max(best_strength, hand_strength)
 
         percentile = calculate_percentile(best_strength, hand_strengths)
-        end_time = time.time()
+        end_time = time.perf_counter()
         execution_time = end_time - start_time
 
-        return f"Hand strength percentile among all 2,598,960 possible poker hands: {percentile:.4f}% \
-        \n Execution time: {execution_time:.4f} seconds."
+        return f"Hand: {sorted_hand} \
+        \n\n Execution time: {execution_time:.12f} seconds. \
+        \n\n Hand strength percentile among all 2,598,960 possible poker hands: \
+        \n{percentile:.4f}%"
 
 
 # <---------------------------------------------->
@@ -234,7 +244,7 @@ def index():
 
         # check if both hand cards were entered
         if not all(hand_cards):
-            output = "Please enter both of your hand cards."
+            output = "Please enter both of your hole cards."
         else:
             evaluation_method = request.form.get('evaluation')
             # Call algorithm selected by the user
