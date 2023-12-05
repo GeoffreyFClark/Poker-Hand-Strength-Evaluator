@@ -2,20 +2,20 @@ from collections import OrderedDict
 import csv
 
 hands = ['AA', 'KK', 'QQ', 'JJ', 'AK', 'TT', 'AK', 'AQ', '99', 'AJ', 'AQ', '88',
-           'AT', 'KQ', 'AJ', '77', 'KJ', 'QJ', 'KT', 'KQ', 'A9', 'AT', '66', 'A8',
-           'QT', 'JT', 'KJ', 'A7', 'A5', 'K9', 'A4', 'A6', '55', 'Q9', 'A3', 'J9',
-           'KT', 'QJ', 'A9', 'T9', 'K8', 'A2', 'K7', '44', 'A8', 'QT', 'Q8', 'JT',
-           'J8', 'K6', '98', 'T8', 'K5', 'A7', 'K4', 'K9', 'A5', '33', 'K3', 'A4',
-           'Q9', '87', 'Q7', 'T7', 'Q6', 'K2', 'J7', 'A6', '97', 'Q5', 'A3', 'J9',
-           'T9', '22', 'K8', 'A2', 'Q4', '76', 'K7', '86', '96', 'J6', 'J5', 'K6',
-           'Q3', 'Q2', 'T6', '65', 'K5', '75', 'Q8', '54', 'J8', 'J4', 'T8', '98',
-           '85', '95', 'K4', 'J3', '64', 'T4', 'T5', '87', 'Q7', 'K3', 'J2', '74',
-           '97', 'J7', '53', 'Q6', 'T3', 'K2', '94', 'T7', '84', '43', '63', 'Q5',
-           '86', 'T2', '93', '76', 'Q4', '92', '96', '73', 'J6', 'Q3', '52', '65',
-         'J5', 'T6', '82', '42', '83', 'Q2', '75', '54', 'J4', '62', '85', '32',
-         '95', '72', 'J3', 'T5', 'T4', '64', 'J2', '53', '74', '84', 'T3', '43',
-         '94', 'T2', '93', '63', '92', '73', '52', '42', '83', '82', '62', '32',
-         '72']
+           'AT', 'KQ', 'AJ', '77', 'JK', 'JQ', 'KT', 'KQ', 'A9', 'AT', '66', '8A',
+           'QT', 'JT', 'KJ', '7A', '5A', '9K', '4A', '6A', '55', '9Q', '3A', '9J',
+           'KT', 'QJ', '9A', '9T', '8K', '2A', '7K', '44', '8A', 'QT', '8Q', 'JT',
+           '8J', '6K', '89', '8T', '5K', '7A', '4K', '9K', '5A', '33', '3K', '4A',
+           '9Q', '87', '7Q', '7T', '6Q', '2K', '7J', '6A', '97', '5Q', 'A3', 'J9',
+           'T9', '22', 'K8', 'A2', 'Q4', '67', 'K7', '68', '69', 'J6', 'J5', 'K6',
+           'Q3', 'Q2', 'T6', '59', 'K5', '57', 'Q8', '45', '8J', '4J', 'T8', '89',
+           '58', '59', '4K', '3J', '46', '4T', '5T', '78', '7Q', '3K', '2J', '47',
+           '79', '7J', '35', 'Q6', '3T', '2K', '49', '7J', '48', '34', '36', '5Q',
+           '68', '2T', '39', '67', '4Q', '29', '69', '37', '6J', '3Q', '25', '56',
+         '5J', '6T', '28', '24', '38', '2Q', '57', '45', '4J', '26', '58', '23',
+         '59', '27', '3J', '5T', '4T', '46', '2J', '35', '47', '48', '3T', '34',
+         '49', '2T', '39', '36', '29', '37', '25', '24', '38', '28', '26', '23',
+         '27']
 
 modified_dataset = OrderedDict()
 
@@ -36,13 +36,19 @@ for card in hands:
 
 reversed_modified_dataset = OrderedDict(reversed(modified_dataset.items()))
 
-total_items = len(reversed_modified_dataset)
-percentiles = {k: (i + 1) / total_items * 100 / 10 for i, k in enumerate(reversed_modified_dataset.keys())}
+swapped_dataset = OrderedDict((key[2:] + key[:2] if key[0] > key[2] else key, value) for key, value in reversed_modified_dataset.items())
+
+total_items = len(hands)
+percentiles = {k: (i + 1) / total_items * 100 / 10 for i, k in enumerate(swapped_dataset.keys())}
 
 csv_filename = '2card_poker_hands.csv'
 with open(csv_filename, 'w', newline='') as csvfile:
     csv_writer = csv.writer(csvfile)
     csv_writer.writerow(['pokerHand', 'strength'])
 
-    for poker_hand, percentile in zip(reversed_modified_dataset.keys(), percentiles.values()):
+    for poker_hand in swapped_dataset.keys():
+        first_char = poker_hand[0]
+        third_char = poker_hand[2]
+        index = hands.index(first_char + third_char)
+        percentile = (total_items - index) / total_items * 10
         csv_writer.writerow([poker_hand, percentile])
