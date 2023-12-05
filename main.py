@@ -54,7 +54,7 @@ def card_sort_key(card):
     #     print(f"Error: Suit '{card[1]}' not found in suit_order.")
     #     suit_index = 0
 
-    return (rank_order.index(card[0]), suit_order.index(card[1]))
+    return (rank_order.index(card.rank), suit_order.index(card.suit))
 
 
 def calculate_percentile(best_strength, hand_strengths):

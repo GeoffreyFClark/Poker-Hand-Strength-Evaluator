@@ -224,7 +224,10 @@
         }
 
         function clearCard(inputElement) {
-            const card = selectedCards[inputElement.name];
+            let card = selectedCards[inputElement.name];
+            if (card === 'AceOfDiamonds') {
+                card = 'AD';
+            }
             if (card) {
                 document.querySelector(`img[data-card="${card}"]`).classList.remove('selected');
             }
