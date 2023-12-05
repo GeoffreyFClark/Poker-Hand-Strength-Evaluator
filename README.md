@@ -1,6 +1,6 @@
 # Poker-Hand-Strength-Visualizer
 
-![Frontend Interface](readme_images/nov23frontend.png)
+![Frontend Interface](readme_images/dec4frontend.png)
 
 ## Key Assignment Requirements:
 Implement 2 non-trivial, **comparable** algorithms or data structures. Data Structures and Algorithms that are **not** counted towards the requirement of two data structures and algorithms:
