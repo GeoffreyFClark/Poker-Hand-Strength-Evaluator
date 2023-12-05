@@ -60,4 +60,5 @@ with open(csv_filename, 'w', newline='') as csvfile:
         third_char = poker_hand[2]
         index = hands.index(first_char + third_char)
         percentile = (total_items - index) / total_items * 10
+        poker_hand = sort_cards(poker_hand[0], poker_hand[1], poker_hand[2], poker_hand[3])
         csv_writer.writerow([poker_hand, percentile])
