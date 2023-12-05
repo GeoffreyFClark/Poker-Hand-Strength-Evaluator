@@ -36,13 +36,17 @@ for card in hands:
 
 reversed_modified_dataset = OrderedDict(reversed(modified_dataset.items()))
 
-total_items = len(reversed_modified_dataset)
-percentiles = {k: (i + 1) / total_items * 100 / 10 for i, k in enumerate(reversed_modified_dataset.keys())}
+swapped_dataset = OrderedDict((key[2:] + key[:2] if key[0] > key[2] else key, value) for key, value in reversed_modified_dataset.items())
+
+total_items = len(swapped_dataset)
+percentiles = {k: (i + 1) / total_items * 100 / 10 for i, k in enumerate(swapped_dataset.keys())}
 
 csv_filename = '2card_poker_hands.csv'
 with open(csv_filename, 'w', newline='') as csvfile:
     csv_writer = csv.writer(csvfile)
     csv_writer.writerow(['pokerHand', 'strength'])
 
-    for poker_hand, percentile in zip(reversed_modified_dataset.keys(), percentiles.values()):
+    for poker_hand, percentile in zip(swapped_dataset.keys(), percentiles.values()):
         csv_writer.writerow([poker_hand, percentile])
+
+print(f'Data written to {csv_filename}')
