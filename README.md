@@ -1,4 +1,4 @@
-# Poker-Hand-Strength-Visualizer
+# Poker-Hand-Strength-Evaluator
 
 Hosted on AWS, you can use this application at: https://cmd9kfui34.us-west-2.awsapprunner.com/
 
