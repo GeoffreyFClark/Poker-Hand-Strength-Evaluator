@@ -1,6 +1,6 @@
 # Poker-Hand-Strength-Evaluator
 
-Hosted on AWS, you can use this application at: https://cmd9kfui34.us-west-2.awsapprunner.com/
+_Previously_ hosted on AWS. ~~You can use this application at: https://cmd9kfui34.us-west-2.awsapprunner.com/~~
 
 ![Frontend Interface](readme_images/dec4frontend.png)
 
